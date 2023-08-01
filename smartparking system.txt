@@ -1,0 +1,72 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+// Constants
+const int NUM_PARKING_SPACES = 4; // Number of parking spaces available
+const int LED_PIN = 13; // LED pin for indicating parking space availability
+
+// Variables
+int parkingSpaces[NUM_PARKING_SPACES]; // Array to store the availability of parking spaces
+
+// Initialize LCD display
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+
+  // Initialize LCD display
+  lcd.begin(16, 2);
+  lcd.print("Smart Parking");
+
+  // Initialize parking spaces
+  for (int i = 0; i < NUM_PARKING_SPACES; i++) {
+    parkingSpaces[i] = 0; // 0 indicates the parking space is available
+  }
+
+  // Set LED pin as output
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  // Check parking space availability
+  checkParkingSpaces();
+
+  // Display parking space status on LCD
+  displayStatus();
+
+  // Delay for a short duration before repeating the loop
+  delay(2000);
+}
+
+void checkParkingSpaces() {
+  // Simulated check for parking space availability
+  for (int i = 0; i < NUM_PARKING_SPACES; i++) {
+    // In a real system, you would use appropriate sensors to detect if a space is occupied
+    // For simplicity, we'll randomly simulate the availability
+    int status = random(2); // 0 indicates the parking space is available, 1 indicates it is occupied
+    parkingSpaces[i] = status;
+  }
+}
+
+void displayStatus() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Parking Spaces");
+
+  for (int i = 0; i < NUM_PARKING_SPACES; i++) {
+    lcd.setCursor(0, i + 1);
+    lcd.print("Space ");
+    lcd.print(i + 1);
+    lcd.print(": ");
+
+    if (parkingSpaces[i] == 0) {
+      lcd.print("Available");
+      digitalWrite(LED_PIN, HIGH); // Turn on LED to indicate an available space
+    } else {
+      lcd.print("Occupied");
+      digitalWrite(LED_PIN, LOW); // Turn off LED to indicate an occupied space
+    }
+  }
+}
+
